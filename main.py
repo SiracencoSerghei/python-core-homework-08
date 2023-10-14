@@ -1,9 +1,12 @@
+"""main"""
 from datetime import date, datetime, timedelta
-from collections import OrderedDict
 
 def update_birthday(birthday: datetime, current_date: date) -> datetime:
+    """update birthday year"""
     # Порівнюємо рік дня народження з поточним роком
-    if birthday.month < current_date.month or (birthday.month == current_date.month and birthday.day < current_date.day):
+    is_birthday_month = birthday.month < current_date.month
+    is_birthday_day = (birthday.month == current_date.month and birthday.day < current_date.day)
+    if is_birthday_month or is_birthday_day:
         # Якщо день народження вже минув у поточному році, збільшуємо рік на 1
         birthday = birthday.replace(year=current_date.year + 1)
     else:
@@ -12,111 +15,43 @@ def update_birthday(birthday: datetime, current_date: date) -> datetime:
     return birthday
 
 def calc_current_period(current_date):
-    print(f'current_date: {current_date}')
+    """calculate current period of week"""
     current_date_index = current_date.weekday()
-    print(f'current_date_index: {current_date_index}')
-    print(current_date.strftime('%A'))
     if current_date_index == 0:
         start_period = current_date - timedelta(2)
         end_period = current_date +timedelta(4)
-    elif (current_date_index >0):
+    elif current_date_index >0:
         start_period = current_date
         end_period = current_date + timedelta(6)
-        
     return start_period, end_period
 
 def get_birthdays_per_week(users):
+    """main function"""
     # Реалізуйте тут домашнє завдання
     # Створення порожнього словника для зберігання інформації про дні народження
     birthdays = {}
-    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        
     # Поточна дата
     current_date = date.today()
-    # current_date = date(2023, 12, 26)
     start_period, end_period = calc_current_period(current_date)
-    print(f'This week: {str(start_period), str(end_period)}')
-    # Фільтрація користувачів, чиї дні народження відповідають поточному тижню
     users_to_congratulate = []
     for user in users:
         birthday = update_birthday(user['birthday'], current_date)
-        # print(f'{user["birthday"]}, {birthday}')
         if start_period <= birthday <= end_period:
             users_to_congratulate.append(user)
-    # print(f'users_to_congratulate: {users_to_congratulate}')
     if not users_to_congratulate:
         print('No users to congratulate')
         return {}
     for user in users_to_congratulate:
         current_birthday = update_birthday(user['birthday'], current_date)
         day_of_the_week = current_birthday.strftime('%A')
-        print(f'day_of_the_week: {day_of_the_week}')
         if day_of_the_week in ('Saturday','Sunday'):
             day_of_the_week = 'Monday'
         birthdays[day_of_the_week] = birthdays.get(day_of_the_week, [])
         birthdays[day_of_the_week].append(user['name'])
-    print(birthdays)
     return birthdays
 
-        
-        # =======================================
-        
-        # variant 2
-        
-        # ======================================
-
-
-# from datetime import date, datetime, timedelta
-
-# def update_birthday(birthday: datetime, current_date: date) -> datetime:
-#     # Порівнюємо рік дня народження з поточним роком
-#     if birthday.month < current_date.month or (birthday.month == current_date.month and birthday.day < current_date.day):
-#         # Якщо день народження вже минув у поточному році, збільшуємо рік на 1
-#         birthday = birthday.replace(year=current_date.year + 1)
-#     else:
-#         # Інакше залишаємо рік без змін
-#         birthday = birthday.replace(year=current_date.year)
-#     return birthday
-
-# def get_birthdays_per_week(users):
-#     # Реалізуйте тут домашнє завдання
-#     # Створення порожнього словника для зберігання інформації про дні народження
-#     birthdays = {}
-#     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        
-#     # Поточна дата
-#     current_date = date.today()
-#     # current_date = date(2023, 12, 26)
-
-#     print(f'current_date: {current_date}')
-#     start_period = current_date
-#     end_period = current_date + timedelta(6)
-#     print(f'This week: {str(start_period), str(end_period)}')
-#     # Фільтрація користувачів, чиї дні народження відповідають поточному тижню
-#     users_to_congratulate = []
-#     for user in users:
-#         birthday = update_birthday(user['birthday'], current_date)
-#         # print(f'{user["birthday"]}, {birthday}')
-#         if start_period <= birthday <= end_period:
-#             users_to_congratulate.append(user)
-#     # print(f'users_to_congratulate: {users_to_congratulate}')
-#     if not users_to_congratulate:
-#         print('No users to congratulate')
-#         return {}
-#     for user in users_to_congratulate:
-#         current_birthday = update_birthday(user['birthday'], current_date)
-#         day_of_the_week = current_birthday.strftime('%A')
-#         print(f'day_of_the_week: {day_of_the_week}')
-#         if day_of_the_week in ('Saturday','Sunday'):
-#             day_of_the_week = 'Monday'
-#         birthdays[day_of_the_week] = birthdays.get(day_of_the_week, [])
-#         birthdays[day_of_the_week].append(user['name'])
-#     print(birthdays)
-#     return birthdays
-
-
 if __name__ == "__main__":
-    users = [
+    users_list = [
     {"name": "Bill Gates", "birthday": date(1955, 10, 28)},
     {"name": "Elon Musk", "birthday": date(1971, 6, 28)},
     {"name": "Mark Zuckerberg", "birthday": date(1984, 5, 14)},
@@ -165,9 +100,8 @@ if __name__ == "__main__":
     {"name": "User for October 31", "birthday": date(2000, 10, 31)}
     ]
 
-    result = get_birthdays_per_week(users)
+    result = get_birthdays_per_week(users_list)
 
     # Виводимо результат
     for day_name, names in result.items():
         print(f"{day_name}: {', '.join(names)}")
-
